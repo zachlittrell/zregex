@@ -42,5 +42,6 @@ namespace nfa {
     nfa singleton_nfa(symbol s);
     nfa noop();
     void compose(nfa& left, nfa& right);
+    void optional_nfa(nfa& n);
 
 }

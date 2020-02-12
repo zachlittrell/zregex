@@ -8,7 +8,12 @@ namespace zregex {
 		auto it = pattern.begin();
 		nfa::nfa compiling = nfa::singleton_nfa(*it++);
 		for (; it != pattern.end(); it++) {
-			nfa::nfa s = nfa::singleton_nfa(*it);
+			symbol c = *it;
+			if (c == '?') {
+				nfa::optional_nfa(compiling);
+				continue;
+			}
+			nfa::nfa s = nfa::singleton_nfa(c);
 			nfa::compose(compiling, s);
 		}
 		return compiling;
