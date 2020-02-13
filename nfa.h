@@ -46,5 +46,6 @@ namespace nfa {
     void optional_nfa(nfa& n);
     void kleene_plus_nfa(nfa& n);
     void kleene_star_nfa(nfa& n);
+    void disjunction_nfa(nfa& left, nfa& right);
 
 }

@@ -49,6 +49,15 @@ namespace nfa {
 		optional_nfa(n);
 	}
 
+	void disjunction_nfa(nfa& left, nfa& right) {
+		//Allow an epsilon jump to hop form left's start to right's start
+		left.epsilon_jumps[left.start_state].insert(right.start_state);
+		left.epsilon_jumps.insert(right.epsilon_jumps.begin(), right.epsilon_jumps.end());
+		left.end_states.insert(right.end_states.begin(), right.end_states.end());
+		left.next_state.insert(right.next_state.begin(), right.next_state.end());
+	
+	}
+
 	bool matches(nfa& n, std::string& input) {
 
 		std::stack<state> states;

@@ -19,3 +19,4 @@ zregex can recognize the following operators:
 * ? - 1 or 0 occurrences 
 * \+ - 1 or many occurrences
 * \* - 0 or many occurrences
+* a|b - Disjunction/a or b 

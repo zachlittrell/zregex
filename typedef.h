@@ -6,5 +6,5 @@
  */
 
 typedef int state;
-typedef char const symbol;
+typedef char symbol;
 typedef std::pair<state, symbol> state_and_symbol;
