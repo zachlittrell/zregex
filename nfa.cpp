@@ -70,7 +70,7 @@ namespace nfa {
 			if (seen.find({ state,it }) != seen.end()) {
 				continue;
 			}
-			seen.insert({ n.start_state,input.begin() });
+			seen.insert({ state,it });
 
 			if (it == input.end()) {
 				if (n.end_states.find(state) != n.end_states.end())
