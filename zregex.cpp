@@ -9,12 +9,21 @@ namespace zregex {
 		nfa::nfa compiling = nfa::singleton_nfa(*it++);
 		for (; it != pattern.end(); it++) {
 			symbol c = *it;
-			if (c == '?') {
+			switch (c) {
+			case '?':
 				nfa::optional_nfa(compiling);
-				continue;
+				break;
+			case '+':
+				nfa::kleene_plus_nfa(compiling);
+				break;
+		//	case '*':
+			//	nfa::kleene_star_nfa(compiling);
+			default: 
+				nfa::nfa s = nfa::singleton_nfa(c);
+				nfa::compose(compiling, s);
 			}
-			nfa::nfa s = nfa::singleton_nfa(c);
-			nfa::compose(compiling, s);
+			
+			
 		}
 		return compiling;
 	}

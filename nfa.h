@@ -44,5 +44,7 @@ namespace nfa {
     bool matches(nfa& n, std::string& input);
     void compose(nfa& left, nfa& right);
     void optional_nfa(nfa& n);
+    void kleene_plus_nfa(nfa& n);
+    void kleene_star_nfa(nfa& n);
 
 }

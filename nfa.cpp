@@ -37,6 +37,18 @@ namespace nfa {
 		n.epsilon_jumps[n.start_state].insert(n.end_states.begin(), n.end_states.end());
 	}
 
+	void kleene_plus_nfa(nfa& n) {
+		//Put an epsilon jump from the end states to the start state;
+		for (state estate : n.end_states) {
+			n.epsilon_jumps[estate].insert(n.start_state);
+		}
+	}
+	void kleene_star_nfa(nfa& n) {
+		//Combine optional and kleene +
+		optional_nfa(n);
+		kleene_plus_nfa(n);
+	}
+
 	bool matches(nfa& n, std::string& input) {
 
 		std::stack<state> states;
