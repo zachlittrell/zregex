@@ -7,7 +7,7 @@
 namespace zregex {
 
 	nfa::nfa compile_to_nfa(std::string& pattern) {
-
+		if (pattern.empty()) return nfa::noop();
 		nfa::nfa compiling;
 		std::stack<bool> starteds;
 		std::stack<bool> needdisjunctives;
