@@ -45,8 +45,8 @@ namespace nfa {
 	}
 	void kleene_star_nfa(nfa& n) {
 		//Combine optional and kleene +
-		optional_nfa(n);
 		kleene_plus_nfa(n);
+		optional_nfa(n);
 	}
 
 	bool matches(nfa& n, std::string& input) {

@@ -16,8 +16,9 @@ namespace zregex {
 			case '+':
 				nfa::kleene_plus_nfa(compiling);
 				break;
-		//	case '*':
-			//	nfa::kleene_star_nfa(compiling);
+			case '*':
+				nfa::kleene_star_nfa(compiling);
+				break;
 			default: 
 				nfa::nfa s = nfa::singleton_nfa(c);
 				nfa::compose(compiling, s);
