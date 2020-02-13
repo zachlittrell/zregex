@@ -23,6 +23,8 @@ namespace nfa {
 		for (auto end_state : left.end_states) {
 			left.epsilon_jumps[end_state].insert(right.start_state);
 		}
+		//Merge epsilon jumps
+		left.epsilon_jumps.insert(right.epsilon_jumps.begin(), right.epsilon_jumps.end());
 		//Add all the edges from right 
 		left.next_state.insert(right.next_state.begin(), right.next_state.end());
 		//Set the end states left to match right
