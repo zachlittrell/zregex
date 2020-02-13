@@ -5,16 +5,18 @@
 #include <stack>
 
 namespace zregex {
-
+	/**
+	 * Returns an nfa to match the regex in pattern
+	 */
 	nfa::nfa compile_to_nfa(std::string& pattern) {
 		if (pattern.empty()) return nfa::noop();
 		nfa::nfa compiling;
-		std::stack<bool> starteds;
-		std::stack<bool> needdisjunctives;
+		std::stack<bool> started;
+		std::stack<bool> active_disjunction;
 		std::stack<nfa::nfa> disjunctives;
-		std::stack<nfa::nfa> groups;
-		needdisjunctives.push(false);
-		starteds.push(false);
+		std::stack<nfa::nfa> leftoff;
+		active_disjunction.push(false);
+		started.push(false);
 		nfa::nfa progress;
 		
 		
@@ -31,60 +33,62 @@ namespace zregex {
 				break;
 			case '|':
 				//We were already disjuncting something!
-				if (needdisjunctives.top()) {
+				if (active_disjunction.top()) {
 					nfa::disjunction_nfa(compiling, disjunctives.top());
 				}
 				else {
-					needdisjunctives.pop();
-					needdisjunctives.push(true);
+					active_disjunction.pop();
+					active_disjunction.push(true);
 					disjunctives.push(compiling);
 				}
-				starteds.pop();
-				starteds.push(false);
+				started.pop();
+				started.push(false);
 				break;
 			case '(':
 
 				//Starting a new group.
 				//Stash what we're working on
-				if (starteds.top()) groups.push(compiling);
-				needdisjunctives.push(false);
-				starteds.push(false);
+				if (started.top()) leftoff.push(compiling);
+				active_disjunction.push(false);
+				started.push(false);
 
 				break;
 			case ')':
 				//Take the opportunity to see if disjunction in progress
-				if (needdisjunctives.top()) {
+				if (active_disjunction.top()) {
 					nfa::disjunction_nfa(compiling, disjunctives.top());
 					disjunctives.pop();
 				}
-				needdisjunctives.pop();
+				active_disjunction.pop();
 
-				starteds.pop();
-				if (starteds.top()) {
+				started.pop();
+				if (started.top()) {
 					//Pop off whatever we stashed and compose it with what 
-					progress = groups.top();
-					groups.pop();
+					progress = leftoff.top();
+					leftoff.pop();
 					nfa::compose(progress, compiling);
 					compiling = progress;
 				}
 				else {
-					starteds.pop();
-					starteds.push(true);
+					started.pop();
+					started.push(true);
 				}
 	
 				break;
 			default: 
 				nfa::nfa s = nfa::singleton_nfa(c);
-				if (starteds.top())
+				if (started.top())
 					nfa::compose(compiling, s);
 				else {
 					compiling = s;
-					starteds.pop();
-					starteds.push(true);
+					started.pop();
+					started.push(true);
 				}
 			}
 		}
-		if (needdisjunctives.top()) {
+		//If we still have an active disjunction, we've reached 
+		//end of the pattern so we can go ahead and complete it
+		if (active_disjunction.top()) {
 			nfa::disjunction_nfa(compiling, disjunctives.top());
 		}
 		return compiling;

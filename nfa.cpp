@@ -1,7 +1,9 @@
 #include "nfa.h"
 #include <stack>
 namespace nfa {
-
+	/**
+	 * Returns an nfa that matches just symbol s
+	 */
 	nfa singleton_nfa(symbol s) {
 		nfa n;
 		n.start_state = new_state();
@@ -10,6 +12,9 @@ namespace nfa {
 		n.next_state.insert({ {n.start_state,s},end });
 		return n;
 	}
+	/**
+	 * Returns an nfa that matches only ""
+	 */
 	nfa noop() {
 		nfa n;
 		state end = new_state();
@@ -18,6 +23,10 @@ namespace nfa {
 		n.epsilon_jumps.insert({n.start_state,{end} });
 		return n;
 	}
+	/** 
+	 * Modifies left so it will match only patterns that are concatenates
+	 * of left and right's valid strings.
+	 */
 	void compose(nfa& left, nfa& right) {
 		//We want the end states of left to continue on to the start of right
 		for (auto end_state : left.end_states) {
@@ -31,26 +40,41 @@ namespace nfa {
 		left.end_states = right.end_states;
 	}
 	state currentstate = 0;
+	/**
+	 * Returns a new, unused state
+	 * TODO come up with a sleeker solution.
+	 */
 	state new_state() {
 		return currentstate++;
 	}
+	/**
+	 * Modifies n so it can match either n's pattern or ""
+	 */
 	void optional_nfa(nfa& n) {
 		//Make an epsilon jump from the start to the end state.
 		n.epsilon_jumps[n.start_state].insert(n.end_states.begin(), n.end_states.end());
 	}
-
+	/**
+	 * Modifies n so it can match n+
+	 */
 	void kleene_plus_nfa(nfa& n) {
 		//Put an epsilon jump from the end states to the start state;
 		for (state estate : n.end_states) {
 			n.epsilon_jumps[estate].insert(n.start_state);
 		}
 	}
+	/**
+	 * Modifies n so it can match n*
+	 */
 	void kleene_star_nfa(nfa& n) {
 		//Combine optional and kleene +
 		kleene_plus_nfa(n);
 		optional_nfa(n);
 	}
 
+	/**
+	 * Modifies left so it can match left|right
+	 */
 	void disjunction_nfa(nfa& left, nfa& right) {
 		//Allow an epsilon jump to hop form left's start to right's start
 		left.epsilon_jumps[left.start_state].insert(right.start_state);
@@ -59,7 +83,9 @@ namespace nfa {
 		left.next_state.insert(right.next_state.begin(), right.next_state.end());
 	
 	}
-
+	/**
+	 * Returns true if input is matched exactly by n
+	 */
 	bool matches(nfa& n, std::string& input) {
 
 		std::stack<state> states;
