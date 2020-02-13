@@ -41,6 +41,7 @@ namespace nfa {
     state new_state();
     nfa singleton_nfa(symbol s);
     nfa noop();
+    bool matches(nfa& n, std::string& input);
     void compose(nfa& left, nfa& right);
     void optional_nfa(nfa& n);
 

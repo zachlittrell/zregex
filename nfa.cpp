@@ -1,4 +1,5 @@
 #include "nfa.h"
+#include <stack>
 namespace nfa {
 
 	nfa singleton_nfa(symbol s) {
@@ -34,5 +35,63 @@ namespace nfa {
 	void optional_nfa(nfa& n) {
 		//Make an epsilon jump from the start to the end state.
 		n.epsilon_jumps[n.start_state].insert(n.end_states.begin(), n.end_states.end());
+	}
+
+	bool matches(nfa& n, std::string& input) {
+
+		std::stack<state> states;
+		std::stack<std::string::iterator> its;
+		states.push(n.start_state);
+		its.push(input.begin());
+
+		//We need to keep track of where we've been to avoid looping
+		typedef std::pair<state,std::string::iterator> state_and_it;
+		std::set<state_and_it> seen;
+
+		state state;
+		do {
+			state = states.top();
+			auto it = its.top();
+			states.pop();
+			its.pop();
+			//Have we been at this node before with this symbol?
+			if (seen.find({ state,it }) != seen.end()) {
+				continue;
+			}
+			seen.insert({ n.start_state,input.begin() });
+
+			if (it == input.end()) {
+				if (n.end_states.find(state) != n.end_states.end())
+				  return true;
+				else {
+					//Add epsilon jumps
+					for (auto estate : n.epsilon_jumps[state]) {
+						states.push(estate);
+						its.push(it);
+					}
+					continue;
+				}
+			}
+			//Add epsilon jumps
+			for (auto estate : n.epsilon_jumps[state]) {
+				states.push(estate);
+				its.push(it);
+			}
+			state_and_symbol ss({ state,*it });
+			auto nextstate = n.next_state.find(ss);
+
+			//Is there an edge for the state/symbol pair?
+			if (nextstate != n.next_state.end()) {
+				//We're not at the end of the input are we?
+				if (it != input.end()) {
+					states.push((*nextstate).second);
+					its.push(it+1);
+				}
+
+			}
+
+
+		} while (!states.empty());
+		return false;
 	}
 }
